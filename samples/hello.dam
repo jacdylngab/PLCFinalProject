@@ -1,0 +1,15 @@
+print "Hello, World!";
+let x = 3;
+//print x + "Javier";
+print x + 2;
+print "Hello " + " " + "World";
+
+if (x == 3) {
+    print "Yay!";
+} else {
+    print "Boo.";
+}
+
+if (x > 4) {
+    print "You shouldn't see this.";
+}
