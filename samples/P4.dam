@@ -1,4 +1,12 @@
-let name;
-print "Enter your name:";
-read name;
-print "Hello " + name;
+//let name;
+//print "Enter your name:";
+//read name;
+//print "Hello " + name;
+
+let s = "Hello";
+//s = false;  Ask about me
+//s = -5.0; Ask about me
+// s = 9; Ask about me
+s = 3.0;
+s = s + 1;
+print s;

@@ -8,28 +8,23 @@
 .method public static main([Ljava/lang/String;)V
     .limit stack 8
     .limit locals 3
-	ldc ""
+	ldc "Hello"
 	astore 1
+	ldc2_w 3.0
+	dstore 1
+	ldc2_w 3.0
+	dstore 1
+	dload 1
+	ldc2_w 1.0
+	dadd
+	dstore 1
+	dload 1
+	ldc2_w 1.0
+	dadd
+	dstore 1
 	getstatic java/lang/System/out Ljava/io/PrintStream;
 
-	ldc "Enter your name:"
-	invokevirtual java/io/PrintStream/println(Ljava/lang/String;)V
-	new java/util/Scanner
-
-	dup
-
-	getstatic java/lang/System/in Ljava/io/InputStream;
-
-	invokespecial java/util/Scanner/<init>(Ljava/io/InputStream;)V
-
-	invokevirtual java/util/Scanner/nextLine()Ljava/lang/String;
-
-	astore 1
-	getstatic java/lang/System/out Ljava/io/PrintStream;
-
-	ldc "Hello "
-	aload 1
-	invokevirtual java/lang/String/concat(Ljava/lang/String;)Ljava/lang/String;
-	invokevirtual java/io/PrintStream/println(Ljava/lang/String;)V
+	dload 1
+	invokevirtual java/io/PrintStream/println(D)V
     return
 .end method

@@ -142,7 +142,13 @@ public class DamGenerator implements Expr.Visitor<String>, Stmt.Visitor<String> 
 
 	@Override
 	public String visitExpressionStmt(Expression stmt) {
-		// TODO Auto-generated method stub
+		// Normal visitor dispatch
+		stmt.expression.accept(this);
+		// If it's an Assign expression, explicitly call visitAssignExpr
+		if (stmt.expression instanceof Expr.Assign) {
+			return visitAssignExpr((Expr.Assign) stmt.expression);
+		}
+
 		return null;
 	}
 
@@ -355,7 +361,32 @@ public class DamGenerator implements Expr.Visitor<String>, Stmt.Visitor<String> 
 
 	@Override
 	public String visitAssignExpr(Assign expr) {
-		// TODO Auto-generated method stub
+		// Visit the right side value
+		expr.right.accept(this);
+
+		// Get the type of the right side value
+		String rhsType = t.get(expr.right);
+
+		// Check if the variable is already defined in the environment.
+		// It should return an DamCompiler error when the variable does not exist.
+		env.get(expr.name);
+
+		// Update the value
+		env.assign(expr.name, rhsType);
+
+		// Find the index of the variable
+		int varIndex = env.getIndex(expr.name);
+
+		// Store the result of the input in the variable at the given index.
+		if (rhsType.equals("double")) {
+			ins.add("dstore " + varIndex);
+		} else if (rhsType.equals("str")) {
+			ins.add("astore " + varIndex);
+		} else if (rhsType.equals("bool")) {
+			ins.add("istore " + varIndex);
+		}
+
+
 		return null;
 	}
 
