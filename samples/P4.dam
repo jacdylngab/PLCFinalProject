@@ -1,0 +1,4 @@
+let name;
+print "Enter your name:";
+read name;
+print "Hello " + name;

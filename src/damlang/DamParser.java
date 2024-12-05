@@ -84,6 +84,10 @@ public class DamParser {
 		if (match(EQUAL)) {
 			initializer = expression();
 		}
+		else{
+			// If no initializer is provided, default to an empty string.
+			initializer = new Expr.Literal("");
+		}
 
 		consume(SEMICOLON, "Expect ';' after variable declaration.");
 		return new Stmt.Let(name, initializer);
