@@ -6,25 +6,15 @@
     return
 .end method
 .method public static main([Ljava/lang/String;)V
-    .limit stack 8
-    .limit locals 3
+    .limit stack 3
+    .limit locals 4
 	ldc "Hello"
 	astore 1
-	ldc2_w 3.0
-	dstore 1
-	ldc2_w 3.0
-	dstore 1
-	dload 1
-	ldc2_w 1.0
-	dadd
-	dstore 1
-	dload 1
-	ldc2_w 1.0
-	dadd
-	dstore 1
 	getstatic java/lang/System/out Ljava/io/PrintStream;
 
-	dload 1
-	invokevirtual java/io/PrintStream/println(D)V
+	aload 1
+	invokevirtual java/io/PrintStream/println(Ljava/lang/String;)V
+	ldc 0.0
+	fstore 2
     return
 .end method

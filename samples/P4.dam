@@ -4,9 +4,22 @@
 //print "Hello " + name;
 
 let s = "Hello";
-//s = false;  Ask about me
-//s = -5.0; Ask about me
+//s = !false;
+//s = -5.0;
+//s = true;
 // s = 9; Ask about me
-s = 3.0;
-s = s + 1;
+//s = 3.0;
+//s = s + 1;
 print s;
+
+//let s;
+//let t = "";
+//s = "Hello";
+//s = 3.0;
+//print t;
+
+let x = 0;
+while (x < 5) {
+    print x;
+    x = x + 1;
+}

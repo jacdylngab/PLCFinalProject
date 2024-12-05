@@ -45,7 +45,7 @@ public class DamGenerator implements Expr.Visitor<String>, Stmt.Visitor<String> 
 	public DamGenerator(List<Stmt> statements) {
 		this.statements = statements;
 		
-		javat.put("double", "D");
+		javat.put("double", "F");
 		javat.put("str", "Ljava/lang/String;");
 		javat.put("bool", "Z");
 		
@@ -142,12 +142,7 @@ public class DamGenerator implements Expr.Visitor<String>, Stmt.Visitor<String> 
 
 	@Override
 	public String visitExpressionStmt(Expression stmt) {
-		// Normal visitor dispatch
 		stmt.expression.accept(this);
-		// If it's an Assign expression, explicitly call visitAssignExpr
-		if (stmt.expression instanceof Expr.Assign) {
-			return visitAssignExpr((Expr.Assign) stmt.expression);
-		}
 
 		return null;
 	}
@@ -231,7 +226,7 @@ public class DamGenerator implements Expr.Visitor<String>, Stmt.Visitor<String> 
 		int varIndex = env.getIndex(stmt.name);
 
 		if (rhsType.equals("double")) {
-			ins.add("dstore " + varIndex);
+			ins.add("fstore " + varIndex);
 		} else if (rhsType.equals("str")) {
 			ins.add("astore " + varIndex);
 		} else if (rhsType.equals("bool")) {
@@ -242,7 +237,8 @@ public class DamGenerator implements Expr.Visitor<String>, Stmt.Visitor<String> 
 
 	@Override
 	public String visitWhileStmt(While stmt) {
-		// TODO Auto-generated method stub
+		String thenLabel = "THEN" + labelCounter;
+		String endLabel = "END" + labelCounter++;
 		return null;
 	}
 
@@ -264,10 +260,10 @@ public class DamGenerator implements Expr.Visitor<String>, Stmt.Visitor<String> 
 		case TokenType.STAR:
 		case TokenType.SLASH:
 			if (ltype.equals("double")) {
-				if (expr.operator.type == TokenType.PLUS)		ins.add("dadd");
-				else if (expr.operator.type == TokenType.MINUS)	ins.add("dsub");
-				else if (expr.operator.type == TokenType.STAR)	ins.add("dmul");
-				else if (expr.operator.type == TokenType.SLASH)	ins.add("ddiv");
+				if (expr.operator.type == TokenType.PLUS)		ins.add("fadd");
+				else if (expr.operator.type == TokenType.MINUS)	ins.add("fsub");
+				else if (expr.operator.type == TokenType.STAR)	ins.add("fmul");
+				else if (expr.operator.type == TokenType.SLASH)	ins.add("fdiv");
 			} else if (ltype.equals("str")) {
 				if (expr.operator.type == TokenType.PLUS) {
 					ins.add("invokevirtual java/lang/String/concat("
@@ -289,7 +285,7 @@ public class DamGenerator implements Expr.Visitor<String>, Stmt.Visitor<String> 
 				t.put(expr, "bool");
 
 				if (ltype.equals("double")){
-					ins.add("dcmpl");
+					ins.add("fcmpl");
 
 					String jumpLabel = conditionLabels.get(expr);
 					if (expr.operator.type == TokenType.BANG_EQUAL)		ins.add("ifeq " + jumpLabel);
@@ -321,13 +317,17 @@ public class DamGenerator implements Expr.Visitor<String>, Stmt.Visitor<String> 
 	public String visitLiteralExpr(Literal expr) {
 		if (expr.value instanceof Double) {
 			t.put(expr, "double");
-			ins.add("ldc2_w " + expr.value);
+			ins.add("ldc " + expr.value);
 		} else if (expr.value instanceof String) {
 			t.put(expr, "str");
 			ins.add("ldc \"" + expr.value + "\"");
 		} else if (expr.value instanceof Boolean) {
 			t.put(expr, "bool");
-			ins.add("iconst_1");
+			if (expr.value.equals(false)){
+				ins.add("iconst_0");
+			}else {
+				ins.add("iconst_1");
+			}
 		}
 		return null;
 	}
@@ -344,7 +344,7 @@ public class DamGenerator implements Expr.Visitor<String>, Stmt.Visitor<String> 
 		t.put(expr, type);
 		
 		if (type.equals("double")) {
-			ins.add("dload " + env.getIndex(expr.name));
+			ins.add("fload " + env.getIndex(expr.name));
 		} else if (type.equals("str")) {
 			ins.add("aload " + env.getIndex(expr.name));
 		} else if (type.equals("bool")) {
@@ -355,7 +355,28 @@ public class DamGenerator implements Expr.Visitor<String>, Stmt.Visitor<String> 
 
 	@Override
 	public String visitUnaryExpr(Unary expr) {
-		// TODO Auto-generated method stub
+		expr.right.accept(this);
+		String rtype = t.get(expr.right);
+
+		if (expr.operator.type == TokenType.BANG) {
+			if (rtype.equals("bool")){
+				ins.add("iconst_1"); // Push '1' onto the stack (to XOR with)
+				ins.add("ixor"); // XOR the value 1 to negate it
+				t.put(expr, rtype); // Updates the type of the operator
+			} else {
+				DamCompiler.error("Cannot apply '!' to non-boolean type.");
+			}
+		}
+
+		else if (expr.operator.type == TokenType.MINUS) {
+			if (rtype.equals("double")) {
+					ins.add("fneg");
+					t.put(expr, rtype); // Updates the type of the operator.
+				} else{
+					DamCompiler.error("Csnnot negate a non double type.");
+				}
+			}
+
 		return null;
 	}
 
@@ -379,7 +400,7 @@ public class DamGenerator implements Expr.Visitor<String>, Stmt.Visitor<String> 
 
 		// Store the result of the input in the variable at the given index.
 		if (rhsType.equals("double")) {
-			ins.add("dstore " + varIndex);
+			ins.add("fstore " + varIndex);
 		} else if (rhsType.equals("str")) {
 			ins.add("astore " + varIndex);
 		} else if (rhsType.equals("bool")) {
