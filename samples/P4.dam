@@ -3,14 +3,14 @@
 //read name;
 //print "Hello " + name;
 
-let s = "Hello";
+//let s = "Hello";
 //s = !false;
 //s = -5.0;
 //s = true;
 // s = 9; Ask about me
 //s = 3.0;
 //s = s + 1;
-print s;
+//print s;
 
 //let s;
 //let t = "";
@@ -23,3 +23,10 @@ while (x < 5) {
     print x;
     x = x + 1;
 }
+
+// Implement me next and other visit things that are implemented yet.
+
+//let x;
+//x = 1;
+//x = x + 9;
+//print x;

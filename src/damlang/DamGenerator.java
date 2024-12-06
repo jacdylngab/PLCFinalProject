@@ -237,8 +237,28 @@ public class DamGenerator implements Expr.Visitor<String>, Stmt.Visitor<String> 
 
 	@Override
 	public String visitWhileStmt(While stmt) {
-		String thenLabel = "THEN" + labelCounter;
+		// Create labels for the start and end of the loop.
+		String startLabel = "START" + labelCounter;
 		String endLabel = "END" + labelCounter++;
+
+		// Set up where the loop starts
+		ins.add(startLabel + ":");
+
+		// Store the endLabel for evualion purposes
+		conditionLabels.put(stmt.condition, endLabel);
+
+		// Visit the condition
+		stmt.condition.accept(this);
+
+		// If the condition is true, visit the body of the loop
+		stmt.body.accept(this);
+
+		// After you are done executing the body, branch back to the startLabel
+		ins.add("goto " + startLabel);
+
+		// Update the endlabel as the program keeps looping.
+		ins.add(endLabel + ":");
+
 		return null;
 	}
 
