@@ -18,15 +18,15 @@
 //s = 3.0;
 //print t;
 
-let x = 0;
-while (x < 5) {
-    print x;
-    x = x + 1;
-}
+//let x = 0;
+//while (x < 5) {
+//    print x;
+//    x = x + 1;
+//}
 
 // Implement me next and other visit things that are implemented yet.
 
-//let x;
-//x = 1;
-//x = x + 9;
-//print x;
+let x;
+x = 1;
+x = (x + 9) + (x + 10);
+print x;

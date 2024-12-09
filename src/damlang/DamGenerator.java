@@ -329,7 +329,15 @@ public class DamGenerator implements Expr.Visitor<String>, Stmt.Visitor<String> 
 
 	@Override
 	public String visitGroupingExpr(Grouping expr) {
-		// TODO Auto-generated method stub
+		// visit the inner expression
+		expr.expression.accept(this);
+
+		// Get the type of the inner expression
+		String innerType = t.get(expr.expression);
+
+		// Store the type of the inner grouping in the type map
+		t.put(expr, innerType);
+
 		return null;
 	}
 
@@ -393,7 +401,7 @@ public class DamGenerator implements Expr.Visitor<String>, Stmt.Visitor<String> 
 					ins.add("fneg");
 					t.put(expr, rtype); // Updates the type of the operator.
 				} else{
-					DamCompiler.error("Csnnot negate a non double type.");
+					DamCompiler.error("Cannot negate a non double type.");
 				}
 			}
 
