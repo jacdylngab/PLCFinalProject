@@ -159,6 +159,43 @@ public class DamGenerator implements Expr.Visitor<String>, Stmt.Visitor<String> 
 			conditionLabels.put(stmt.condition, elseLabel);
 		}
 		stmt.condition.accept(this);
+		String conditionType = t.get(stmt.condition);
+		if (conditionType.equals("bool")){
+			// If the condition is true, branch to the thenLabel
+			ins.add("ifne " + thenLabel);
+			if (stmt.elseBranch != null){
+				ins.add("goto " + elseLabel); // Branch to the elseLabel is false
+			} else {
+				ins.add("goto " + endLabel);  // Goto to the endLabel if there's no elsebranch
+			}
+		} else if(conditionType.equals("double")){
+			ins.add("fconst_0");
+			ins.add("fcmpl");
+			// If not zero, jump to the thenLabel
+			ins.add("ifne " + thenLabel);
+			if (stmt.elseBranch != null){
+				ins.add("goto " + elseLabel); // If zero, jump to the elseLabel
+			} else{
+				// Goto to the endLabel if there's no else branch
+				ins.add("goto " + endLabel);
+			}
+		} else if (conditionType.equals("str")){
+			ins.add("ldc \"\"");
+			ins.add("invokevirtual java/lang/String/compareTo(Ljava/lang/String;)I");
+			// If not empty, goto the endLabel
+			ins.add("ifne " + thenLabel);
+			if (stmt.elseBranch != null){
+				// If not, branch to the else label
+				ins.add("goto " + elseLabel);
+			} else{
+				// Go to the END if there's no elseLabel
+				ins.add("goto " + endLabel);
+			}
+		} else {
+			DamCompiler.error("The condition is wrong: " + conditionType);
+			return null;
+		}
+
 		ins.add(thenLabel + ":");
 		stmt.thenBranch.accept(this);
 
@@ -362,7 +399,57 @@ public class DamGenerator implements Expr.Visitor<String>, Stmt.Visitor<String> 
 
 	@Override
 	public String visitLogicalExpr(Logical expr) {
-		// TODO Auto-generated method stub
+		// Labels for true, false, and end
+		String trueLabel = "TRUE" + labelCounter;
+		String falseLabel = "FALSE" + labelCounter;
+		String endLabel = "END" + labelCounter++;
+
+		// Visit the left part
+		expr.left.accept(this);
+		// Get the types of the left and right to ensure that they match
+		String ltype = t.get(expr.left);
+		if (!ltype.equals("bool")){
+			DamCompiler.error("The value needs to be a bool");
+			return null;
+		}
+
+		// For AND, if it is left part is false, we do not need to keep checking, we can automatically go the falseLabel
+		if (expr.operator.type == TokenType.AND){
+			ins.add("ifeq " + falseLabel);
+		}
+		// For OR, if it left part is true, we do not need to keep checking, we can automatically go to the trueLabel
+		if (expr.operator.type == TokenType.OR){
+			ins.add("ifne " + trueLabel);
+		}
+
+		// Visit the right part
+		expr.right.accept(this);
+		String rtype = t.get(expr.right);
+		if (!rtype.equals("bool")){
+			DamCompiler.error("The value needs to be a bool");
+			return null;
+		}
+		
+		// If right is true, jump to trueLabel
+		ins.add("ifne " + trueLabel);
+		// Otherwise, go to falseLabel
+		ins.add("goto " + falseLabel);
+
+		// If it is true label, push 1 for true
+		ins.add(trueLabel + ":");
+		ins.add("iconst_1");
+		ins.add("goto " + endLabel);
+
+		// If it is false, push 0 for false
+		ins.add(falseLabel + ":");
+		ins.add("iconst_0");
+
+		// End label
+		ins.add(endLabel + ":");
+
+		// Update in the put dictionary the result returned
+		t.put(expr, "bool");
+
 		return null;
 	}
 

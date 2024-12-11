@@ -24,9 +24,39 @@
 //    x = x + 1;
 //}
 
-// Implement me next and other visit things that are implemented yet.
+//let x;
+//x = 1;
+//x = (x + 9) + (x + 10);
+//print x;
 
-let x;
-x = 1;
-x = (x + 9) + (x + 10);
-print x;
+
+//let x = 3;
+//let y = 4;
+//if ((x < 3) and (y < 4)) {
+//    print x;
+//  } else {
+//    print y;
+//}
+
+// Type casting
+//let s = str(3.0);          // "3.0"
+//print s;
+//let x = double(s);         // 3.0 again
+//print x;
+//let b1 = bool(x);          // true, because 3.0 is truthy
+//print b1;
+//let b2 = bool(1.0 + 2.0);  // same
+//print b2;
+
+if ("non-empty") {
+    print "I should see this.";
+}
+if (0.0) {
+    print "I should NOT see this.";
+}
+if ("") {
+     print "I should not see this.  The empty string is not truthy.";
+}
+//if (!"") {
+//     print "Type error on the prior line.  You cannot negate a str.";
+//}
